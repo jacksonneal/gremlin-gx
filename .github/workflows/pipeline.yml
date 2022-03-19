@@ -33,7 +33,7 @@ jobs:
         distribution: 'adopt'
     - run: npm ci
     - run: npm run generate
-    - run: ls generate
+    - run: ls generated
     - run: npm run test-coverage
     - run: npm run lint-check
     - run: npm run format-check
