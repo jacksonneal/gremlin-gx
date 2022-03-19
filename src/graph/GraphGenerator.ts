@@ -1,11 +1,11 @@
 import GremlinGxListener from '../../generated/parser/GremlinGxListener';
-import { ElementConstraint } from './ElementConstraint';
+import { ElementConstraint } from './constraints/ElementConstraint';
 import { GraphConstraint } from './GraphConstraint';
 import { FROM, TO } from './constants';
-import { EqConstraint } from './PropertyConstraint';
+import { EqConstraint } from './constraints/PropertyConstraint';
 import { Step } from './steps/Step';
 import { VStep } from './steps/VStep';
-import { OutStep } from './Step/OutStep';
+import { OutStep } from './steps/OutStep';
 import { HasStringObjectStep } from './steps/HasStringObjectStep';
 
 export default class GraphGenerator extends GremlinGxListener {

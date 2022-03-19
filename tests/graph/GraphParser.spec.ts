@@ -1,7 +1,7 @@
 import * as GraphParser from '../../src/graph/GraphParser';
-import { EdgeConstraint, ElementType, VertexConstraint } from '../../src/graph/ElementConstraint';
+import { EdgeConstraint, ElementType, VertexConstraint } from '../../src/graph/constraints/ElementConstraint';
 import { FROM, ID, LABEL, TO } from '../../src/graph/constants';
-import { EqConstraint } from '../../src/graph/PropertyConstraint';
+import { EqConstraint } from '../../src/graph/constraints/PropertyConstraint';
 
 describe('traversalSourceSpawnMethod_V', () => {
   test('g.V()', () => {

@@ -1,8 +1,8 @@
 import { Step } from './Step';
 import { GraphConstraint } from '../GraphConstraint';
-import { ElementType, VertexConstraint } from '../ElementConstraint';
+import { ElementType, VertexConstraint } from '../constraints/ElementConstraint';
 import { ID } from '../constants';
-import { EqConstraint } from '../PropertyConstraint';
+import { EqConstraint } from '../constraints/PropertyConstraint';
 
 export class VStep implements Step {
   private readonly ids: Set<string>;

@@ -4,7 +4,7 @@ import GremlinGxParser from '../../generated/parser/GremlinGxParser';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import antlr4 from 'antlr4';
-import { ElementConstraint, ElementType } from './ElementConstraint';
+import { ElementConstraint, ElementType } from './constraints/ElementConstraint';
 import { FROM, TO } from './constants';
 
 export const parse = (input: string) => {

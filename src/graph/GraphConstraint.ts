@@ -1,6 +1,6 @@
-import { ElementConstraint } from './ElementConstraint';
+import { ElementConstraint } from './constraints/ElementConstraint';
 import { FROM, TO } from './constants';
-import { EqConstraint } from './PropertyConstraint';
+import { EqConstraint } from './constraints/PropertyConstraint';
 
 export class GraphConstraint {
   vertices: Set<ElementConstraint>;

@@ -1,7 +1,7 @@
 import { Step } from './Step';
 import { GraphConstraint } from '../GraphConstraint';
-import { ElementConstraint, StructConstraint } from '../ElementConstraint';
-import { EqConstraint, NeqConstraint } from '../PropertyConstraint';
+import { ElementConstraint, StructConstraint } from '../constraints/ElementConstraint';
+import { EqConstraint, NeqConstraint } from '../constraints/PropertyConstraint';
 
 export class HasStringObjectStep implements Step {
   private readonly key: string;

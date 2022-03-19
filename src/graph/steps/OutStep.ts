@@ -1,8 +1,8 @@
-import { Step } from '../steps/Step';
+import { Step } from './Step';
 import { GraphConstraint } from '../GraphConstraint';
-import { EdgeConstraint, ElementConstraint, ElementType, VertexConstraint } from '../ElementConstraint';
+import { EdgeConstraint, ElementConstraint, ElementType, VertexConstraint } from '../constraints/ElementConstraint';
 import { FROM, LABEL, TO } from '../constants';
-import { EqConstraint } from '../PropertyConstraint';
+import { EqConstraint } from '../constraints/PropertyConstraint';
 
 export class OutStep implements Step {
   private readonly labels: Set<string>;
