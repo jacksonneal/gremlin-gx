@@ -7,7 +7,6 @@
     "generate": "java -jar resources/antlr-4.9.3-complete.jar src/grammar/GremlinGx.g4 -Dlanguage=JavaScript -o generated/parser",
     "dev": "webpack serve --mode=development",
     "build": "webpack --mode=production",
-    "deploy": "sh deploy.sh dist",
     "lint": "eslint --ignore-path .gitignore --ext .js,.ts . --fix",
     "lint-check": "eslint --ignore-path .gitignore --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",

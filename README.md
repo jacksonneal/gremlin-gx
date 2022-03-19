@@ -36,12 +36,6 @@ Build Dependencies:
 > npm run build
 ```
 
-3. Deploy bundled `dist` directory
-
-```bash
-> npm run deploy
-```
-
 ## Development
 
 Run Webpack with serve in dev mode with hot reload
