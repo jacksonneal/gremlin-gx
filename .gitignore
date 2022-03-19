@@ -94,8 +94,5 @@ fabric.properties
 .idea/
 typings/
 
-# Resources
-resources/
-
 # Generated
 generated/
