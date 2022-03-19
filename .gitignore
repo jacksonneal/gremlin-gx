@@ -96,3 +96,6 @@ typings/
 
 # Generated
 generated/
+
+# Resources
+resources/
