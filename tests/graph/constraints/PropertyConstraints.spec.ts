@@ -58,3 +58,12 @@ describe('canMerge', () => {
     expect(new WithoutConstraint([x]).canMerge(new WithoutConstraint([y]))).toBe(res);
   });
 });
+
+describe('merge', () => {
+  const obj = {};
+  const arr = [];
+
+  test.each([[1], ['x'], [true], [obj], [arr]])(`EqMerge %s`, (x) => {
+    expect(new EqConstraint(x).merge(new EqConstraint(x)).value()).toBe(x);
+  });
+});
