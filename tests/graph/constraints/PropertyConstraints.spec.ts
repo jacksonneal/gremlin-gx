@@ -1,5 +1,15 @@
 import { EqConstraint, NeqConstraint, WithoutConstraint } from '../../../src/graph/constraints/PropertyConstraint';
 
+describe('value', () => {
+  const obj = {};
+  const arr = [];
+  test.each([[1], [true], ['x'], [obj], [arr]])(`value %s`, (x) => {
+    expect(new EqConstraint(x).value()).toBe(x);
+    expect(new NeqConstraint(x).value()).not.toBe(x);
+    expect([x]).not.toContain(new WithoutConstraint([x]).value());
+  });
+});
+
 describe('canMerge', () => {
   const obj = {};
   const arr = [];
@@ -65,5 +75,15 @@ describe('merge', () => {
 
   test.each([[1], ['x'], [true], [obj], [arr]])(`EqMerge %s`, (x) => {
     expect(new EqConstraint(x).merge(new EqConstraint(x)).value()).toBe(x);
+    expect(new EqConstraint(x).merge(new NeqConstraint(!x)).value()).toBe(x);
+    expect(new NeqConstraint(!x).merge(new EqConstraint(x)).value()).toBe(x);
+    expect(new EqConstraint(x).merge(new WithoutConstraint([!x])).value()).toBe(x);
+    expect(new WithoutConstraint([!x]).merge(new EqConstraint(x)).value()).toBe(x);
+    expect(new NeqConstraint(x).merge(new NeqConstraint(x)).value()).toBe(new WithoutConstraint([x]).value());
+    expect(new NeqConstraint(x).merge(new WithoutConstraint([x])).value()).toBe(new WithoutConstraint([x]).value());
+    expect(new WithoutConstraint([x]).merge(new NeqConstraint(x)).value()).toBe(new WithoutConstraint([x]).value());
+    expect(new WithoutConstraint([x]).merge(new WithoutConstraint([x])).value()).toBe(
+      new WithoutConstraint([x]).value()
+    );
   });
 });

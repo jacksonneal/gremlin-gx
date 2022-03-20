@@ -42,7 +42,7 @@ export class EqConstraint implements PropertyConstraint {
   }
 
   canMergeWithout(other: WithoutConstraint): boolean {
-    return !other.$without.includes(this.$eq);
+    return !other.$without.has(this.$eq);
   }
 
   merge(other: PropertyConstraint): PropertyConstraint {
@@ -102,16 +102,15 @@ export class NeqConstraint implements PropertyConstraint {
   }
 
   value(): any {
-    // TODO: generate value
-    return 'NOT' + this.$neq;
+    return `NOT:${this.$neq}`;
   }
 }
 
 export class WithoutConstraint implements PropertyConstraint {
-  $without: any[];
+  $without: Set<any>;
 
   constructor($without: any[]) {
-    this.$without = $without;
+    this.$without = new Set($without);
   }
 
   canMerge(other: PropertyConstraint): boolean {
@@ -119,7 +118,7 @@ export class WithoutConstraint implements PropertyConstraint {
   }
 
   canMergeEq(other: EqConstraint): boolean {
-    return !this.$without.includes(other.$eq);
+    return !this.$without.has(other.$eq);
   }
 
   canMergeNeq(_other: NeqConstraint): boolean {
@@ -143,11 +142,10 @@ export class WithoutConstraint implements PropertyConstraint {
   }
 
   mergeWithout(other: WithoutConstraint): PropertyConstraint {
-    return new WithoutConstraint(this.$without.concat(other.$without));
+    return new WithoutConstraint([...this.$without, ...other.$without]);
   }
 
   value(): any {
-    // TODO: generate value
-    return 'WITHOUT VALUE';
+    return `WITHOUT:${[...this.$without]}`;
   }
 }
