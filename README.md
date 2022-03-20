@@ -15,7 +15,7 @@ External Components:
 
 - Download ANTLR tool [antlr-4.9.3-complete.jar](https://www.antlr.org/download.html), place in `resources` directory.
 
-Build Dependencies:
+Dependencies:
 
 ```bash
 # Install dependencies
