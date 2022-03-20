@@ -21,7 +21,7 @@ export interface ElementConstraint {
   merge(other: ElementConstraint): ElementConstraint;
 }
 
-const elementConstraintFactory = (type: ElementType) => {
+export const elementConstraintFactory = (type: ElementType) => {
   switch (type) {
     case ElementType.VERTEX:
       return new VertexConstraint();
@@ -59,28 +59,29 @@ abstract class AbstractElementConstraint implements ElementConstraint {
     if (this.type !== other.type) {
       return false;
     }
+    let canMerge = true;
     this.properties.forEach((value, key) => {
       const otherProperty = other.get(key);
       if (otherProperty && !value.canMerge(otherProperty)) {
-        return false;
+        canMerge = false;
       }
     });
-    return true;
+    return canMerge;
   }
 
   merge(other: ElementConstraint): ElementConstraint {
-    const merged = elementConstraintFactory(this.type);
+    const mergedElement = elementConstraintFactory(this.type);
     this.properties.forEach((value, key) => {
       const otherProperty = other.get(key);
       const mergedProperty = otherProperty ? value.merge(otherProperty) : value;
-      merged.trySet(key, mergedProperty);
+      mergedElement.trySet(key, mergedProperty);
     });
     other.properties.forEach((value, key) => {
       if (!this.get(key)) {
-        this.trySet(key, value);
+        mergedElement.trySet(key, value);
       }
     });
-    return merged;
+    return mergedElement;
   }
 }
 
