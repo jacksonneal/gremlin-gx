@@ -1,14 +1,14 @@
 import $ from 'jquery';
 import cytoscape from 'cytoscape';
 import cola from 'cytoscape-cola';
-import 'tooltipster';
 import { parse, toDataset } from './graph/GraphParser';
-import './css/normalize.css';
 import './css/index.css';
-import './css/open-sans.css';
-import './css/skeleton.css';
-import './css/font-awesome.css';
-import './css/tooltipster.bundle.min.css';
+import '@fontsource/open-sans';
+import 'skeleton-css/css/normalize.css';
+import 'skeleton-css/css/skeleton.css';
+import 'font-awesome/css/font-awesome.css';
+import 'tooltipster/dist/js/tooltipster.bundle.min.js';
+import 'tooltipster/dist/css/tooltipster.bundle.min.css';
 import fancy from './stylesheets/fancy.json';
 import plainPath from './stylesheets/plain.cycss';
 
