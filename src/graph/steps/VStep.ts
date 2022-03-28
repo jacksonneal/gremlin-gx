@@ -1,8 +1,8 @@
-import { Step } from './Step';
-import { GraphConstraint } from '../GraphConstraint';
-import { ElementType, VertexConstraint } from '../constraints/ElementConstraint';
-import { ID } from '../constants';
-import { EqConstraint } from '../constraints/PropertyConstraint';
+import {Step} from './Step';
+import {GraphConstraint} from '../GraphConstraint';
+import {ElementType, VertexConstraint} from '../constraints/ElementConstraint';
+import {ID} from '../constants';
+import {EqConstraint} from '../constraints/PropertyConstraint';
 
 export class VStep implements Step {
   private readonly ids: Set<string>;
@@ -49,6 +49,15 @@ export class VStep implements Step {
       return included / this.ids.size;
     } else {
       return Math.min(graph.head.size, 1);
+    }
+  }
+
+  passDownstreamMinimality(graph: GraphConstraint): number {
+    graph.head = new Set([...graph.vertices]);
+    if (this.ids.size > 0) {
+      return this.ids.size / graph.head.size;
+    } else {
+      return 1 / graph.head.size;
     }
   }
 }

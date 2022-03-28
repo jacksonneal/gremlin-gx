@@ -27,16 +27,9 @@ export const toDataset = (elements: Set<ElementConstraint>) => {
   const toDataObj = (element: ElementConstraint) => {
     const template = {
       data: {
-        id: (<any>crypto).randomUUID(),
-        social: true
+        id: (<any>crypto).randomUUID()
       },
-      position: {},
-      group: element.type === ElementType.VERTEX ? 'nodes' : 'edges',
-      removed: false,
-      selected: false,
-      selectable: true,
-      locked: false,
-      grabbable: true
+      group: element.type === ElementType.VERTEX ? 'nodes' : 'edges'
     };
 
     element.properties.forEach((constraint, key) => {

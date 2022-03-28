@@ -68,4 +68,24 @@ export class OutStep implements Step {
     const numShouldHave = Math.max(this.labels.size, 1);
     return Math.min(1, graph.head.size / numShouldHave);
   }
+
+  passDownstreamMinimality(graph: GraphConstraint): number {
+    const nextHead = new Set<ElementConstraint>();
+    graph.head.forEach((h) => {
+      graph.edges.forEach((e) => {
+        if (e.get(FROM)?.value() === h && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
+          nextHead.add(e.get(TO)?.value());
+        }
+      });
+    });
+
+    graph.head = nextHead;
+
+    if (graph.head.size === 0) {
+      return 0;
+    } else {
+      const numShouldHave = Math.max(this.labels.size, 1);
+      return Math.min(1, numShouldHave / graph.head.size);
+    }
+  }
 }

@@ -4,4 +4,6 @@ export interface Step {
   passUpstream(graph: GraphConstraint);
 
   passDownstreamCompleteness(graph: GraphConstraint): number;
+
+  passDownstreamMinimality(graph: GraphConstraint): number;
 }

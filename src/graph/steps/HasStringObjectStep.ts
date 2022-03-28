@@ -49,4 +49,28 @@ export class HasStringObjectStep implements Step {
     }
     return ret / 2;
   }
+
+  passDownstreamMinimality(graph: GraphConstraint): number {
+    const nextHead = new Set<ElementConstraint>();
+    let pass = false;
+    let fail = false;
+    graph.head.forEach((h) => {
+      if (h.get(this.key)?.value() === this.value) {
+        pass = true;
+        nextHead.add(h);
+      } else if (h.get(this.key)?.value() !== this.value) {
+        fail = true;
+      }
+    });
+    graph.head = nextHead;
+
+    let ret = 0;
+    if (pass) {
+      ret++;
+    }
+    if (fail) {
+      ret++;
+    }
+    return ret / 2;
+  }
 }
