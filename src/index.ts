@@ -13,6 +13,8 @@ import fancy from './stylesheets/fancy.json';
 import plainPath from './stylesheets/plain.cycss';
 
 const onContentLoaded = () => {
+  $("body").show();
+
   cytoscape.use(cola);
 
   const tryPromise = (fn) => Promise.resolve().then(fn);
