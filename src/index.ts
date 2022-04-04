@@ -9,6 +9,7 @@ import 'skeleton-css/css/skeleton.css';
 import 'font-awesome/css/font-awesome.css';
 import 'tooltipster/dist/js/tooltipster.bundle.min.js';
 import 'tooltipster/dist/css/tooltipster.bundle.min.css';
+import { ScoredGraph } from './graph/Metric';
 
 const onContentLoaded = () => {
   $('body').show();
@@ -48,7 +49,8 @@ const onContentLoaded = () => {
     })
     .selector('edge')
     .style({
-      'curve-style': 'haystack',
+      'curve-style': 'bezier',
+      'target-arrow-shape': 'triangle',
       opacity: '0.5',
       'line-color': '#aaa',
       'overlay-padding': '3px',
@@ -64,14 +66,17 @@ const onContentLoaded = () => {
     });
 
   const $query = $(`#query`);
-  const getDataset = (query) => toDataset(parse(query));
-  const applyDataset = (dataset) => {
+  const getGraph = (query): ScoredGraph => parse(query);
+  const applyGraph = (res: ScoredGraph) => {
+    const dataset = toDataset(new Set(res.graph.elements()));
     cy.zoom(0.001);
     cy.pan({ x: -9999999, y: -9999999 });
     cy.elements().remove();
     cy.add(dataset);
+    $('#completeness').html(res.completeness.toFixed(4));
+    $('#minimality').html(res.minimality.toFixed(4));
   };
-  const applyDatasetFromInput = () => Promise.resolve($query.val()).then(getDataset).then(applyDataset);
+  const applyGraphFromInput = () => Promise.resolve($query.val()).then(getGraph).then(applyGraph);
 
   const maxLayoutDuration = 1500;
   const layoutPadding = 50;
@@ -98,14 +103,14 @@ const onContentLoaded = () => {
   };
 
   $query.on('input', () => {
-    tryPromise(applyDatasetFromInput).then(applyLayout);
+    tryPromise(applyGraphFromInput).then(applyLayout);
   });
 
   (<any>$('.tooltip')).tooltipster();
 
-  $query.val("g.V().out().has('name', 'Jax')");
+  $query.val('g.V()');
 
-  tryPromise(applyDatasetFromInput).then(applyLayout);
+  tryPromise(applyGraphFromInput).then(applyLayout);
 };
 
 document.addEventListener('DOMContentLoaded', onContentLoaded);

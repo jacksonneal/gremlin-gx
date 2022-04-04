@@ -15,23 +15,18 @@ export class OutStep implements Step {
     if (graph.head.size === 0) {
       graph.head.add(new VertexConstraint());
     }
-
-    const labelsToUse = [...this.labels];
-
     const nextHead: Set<ElementConstraint> = new Set();
+    const labelsToUse = [...this.labels];
 
     graph.head.forEach((h) => {
       h.type = ElementType.VERTEX;
-
       const from = new VertexConstraint();
       const edge = new EdgeConstraint();
-      edge.trySet(FROM, new EqConstraint(from));
-      edge.trySet(TO, new EqConstraint(h));
-
+      edge.trySet(FROM, new EqConstraint(from.uid));
+      edge.trySet(TO, new EqConstraint(h.uid));
       if (labelsToUse.length > 0) {
         edge.trySet(LABEL, new EqConstraint(labelsToUse.pop()));
       }
-
       graph.vertices.add(h);
       graph.vertices.add(from);
       graph.edges.add(edge);
@@ -40,16 +35,16 @@ export class OutStep implements Step {
 
     labelsToUse.forEach((label) => {
       const from = new VertexConstraint();
+      const to = new VertexConstraint();
       const edge = new EdgeConstraint();
-      edge.trySet(FROM, new EqConstraint(from));
-      edge.trySet(TO, new EqConstraint(graph.vertices.values().next()));
+      edge.trySet(FROM, new EqConstraint(from.uid));
+      edge.trySet(TO, new EqConstraint(to.uid));
       edge.trySet(LABEL, new EqConstraint(label));
-
       graph.vertices.add(from);
+      graph.vertices.add(to);
       graph.edges.add(edge);
       nextHead.add(from);
     });
-
     graph.head = nextHead;
   }
 
@@ -57,8 +52,8 @@ export class OutStep implements Step {
     const nextHead = new Set<ElementConstraint>();
     graph.head.forEach((h) => {
       graph.edges.forEach((e) => {
-        if (e.get(FROM)?.value() === h && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
-          nextHead.add(e.get(TO)?.value());
+        if (h.coversId(e.get(FROM)?.value()) && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
+          nextHead.add(graph.findVertex(e.get(TO)?.value())!);
         }
       });
     });
@@ -73,8 +68,8 @@ export class OutStep implements Step {
     const nextHead = new Set<ElementConstraint>();
     graph.head.forEach((h) => {
       graph.edges.forEach((e) => {
-        if (e.get(FROM)?.value() === h && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
-          nextHead.add(e.get(TO)?.value());
+        if (h.coversId(e.get(FROM)?.value()) && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
+          nextHead.add(graph.findVertex(e.get(TO)?.value())!);
         }
       });
     });

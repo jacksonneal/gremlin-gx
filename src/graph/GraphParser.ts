@@ -21,32 +21,37 @@ export const parse = (input: string) => {
   return graphGenerator.getGraph();
 };
 
-export const toDataset = (elements: Set<ElementConstraint>) => {
-  const elementMap = new Map<ElementConstraint, string>();
+export const toDataset = (elements: Set<ElementConstraint>): any[] => {
+  const memberIdMap = new Map<string, string>();
 
   const toDataObj = (element: ElementConstraint) => {
     const template = {
       data: {
-        id: (<any>crypto).randomUUID()
+        id: element.uid
       },
       group: element.type === ElementType.VERTEX ? 'nodes' : 'edges'
     };
-
     element.properties.forEach((constraint, key) => {
       if ([TO, FROM].includes(key)) {
-        template.data[key] = elementMap.get(constraint.value());
+        console.log('Accessing uids for edge endpoints:', constraint.value());
+        console.log(memberIdMap.get(constraint.value()));
+        template.data[key] = memberIdMap.get(constraint.value());
       } else {
         template.data[key] = constraint.value();
       }
     });
-
-    elementMap.set(element, template.data.id);
-
+    memberIdMap.set(element.uid, element.uid);
+    element.memberUids.forEach((mId) => memberIdMap.set(mId, element.uid));
+    // element.merged.forEach((member) => elementMap.set(member, template.data.id));
     return template;
   };
 
   const vertexDataset = [...elements].filter((e) => e.type === ElementType.VERTEX).map(toDataObj);
+
+  console.log('member uids', memberIdMap);
   const edgeDataset = [...elements].filter((e) => e.type === ElementType.EDGE).map(toDataObj);
+
+  console.log(vertexDataset.concat(edgeDataset));
 
   return vertexDataset.concat(edgeDataset);
 };

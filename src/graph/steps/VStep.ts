@@ -15,19 +15,14 @@ export class VStep implements Step {
     if (graph.head.size === 0) {
       graph.head.add(new VertexConstraint());
     }
-
     const idsToUse = [...this.ids];
-
     graph.head.forEach((h) => {
       h.type = ElementType.VERTEX;
-
       if (idsToUse.length) {
         h.trySet(ID, new EqConstraint(idsToUse.pop()));
       }
-
       graph.vertices.add(h);
     });
-
     idsToUse.forEach((id) => {
       const v = new VertexConstraint();
       v.trySet(ID, new EqConstraint(id));

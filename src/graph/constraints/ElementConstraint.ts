@@ -7,6 +7,8 @@ export enum ElementType {
 }
 
 export interface ElementConstraint {
+  uid: string;
+  memberUids: Set<string>;
   properties: Map<string, PropertyConstraint>;
   type: ElementType;
 
@@ -19,6 +21,10 @@ export interface ElementConstraint {
   canMerge(other: ElementConstraint): boolean;
 
   merge(other: ElementConstraint): ElementConstraint;
+
+  diffScore(other: ElementConstraint): number;
+
+  coversId(uid: string): boolean;
 }
 
 export const elementConstraintFactory = (type: ElementType) => {
@@ -33,16 +39,22 @@ export const elementConstraintFactory = (type: ElementType) => {
 };
 
 abstract class AbstractElementConstraint implements ElementConstraint {
+  uid: string;
+  memberUids: Set<string>;
   type: ElementType;
   properties: Map<string, PropertyConstraint>;
 
   protected constructor(type: ElementType) {
+    this.uid = (<any>crypto).randomUUID();
+    this.memberUids = new Set();
     this.properties = new Map<string, PropertyConstraint>();
     this.type = type;
   }
 
   copy(): ElementConstraint {
     const copy = elementConstraintFactory(this.type);
+    copy.uid = this.uid;
+    copy.memberUids = new Set(this.memberUids);
     this.properties.forEach((val, key) => copy.trySet(key, val));
     return copy;
   }
@@ -81,7 +93,30 @@ abstract class AbstractElementConstraint implements ElementConstraint {
         mergedElement.trySet(key, value);
       }
     });
+    this.memberUids.forEach((uid) => mergedElement.memberUids.add(uid));
+    other.memberUids.forEach((uid) => mergedElement.memberUids.add(uid));
+    mergedElement.memberUids.add(this.uid);
+    mergedElement.memberUids.add(other.uid);
     return mergedElement;
+  }
+
+  diffScore(other: ElementConstraint): number {
+    let diff = 0;
+    this.properties.forEach((value, key) => {
+      if (!other.properties.has(key)) {
+        diff++;
+      }
+    });
+    other.properties.forEach((value, key) => {
+      if (!this.properties.has(key)) {
+        diff++;
+      }
+    });
+    return diff;
+  }
+
+  coversId(uid: string): boolean {
+    return this.uid === uid || this.memberUids.has(uid);
   }
 }
 

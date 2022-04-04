@@ -1,5 +1,4 @@
 import GremlinGxListener from '../../generated/parser/GremlinGxListener';
-import { ElementConstraint } from './constraints/ElementConstraint';
 import { GraphConstraint } from './GraphConstraint';
 import { FROM, TO } from './constants';
 import { EqConstraint } from './constraints/PropertyConstraint';
@@ -7,6 +6,7 @@ import { Step } from './steps/Step';
 import { VStep } from './steps/VStep';
 import { OutStep } from './steps/OutStep';
 import { HasStringObjectStep } from './steps/HasStringObjectStep';
+import { measure, Metric, ScoredGraph } from './Metric';
 
 export default class GraphGenerator extends GremlinGxListener {
   private tree: Step[];
@@ -45,59 +45,94 @@ export default class GraphGenerator extends GremlinGxListener {
     this.tree.push(new HasStringObjectStep(key, value));
   }
 
-  getGraph(): Set<ElementConstraint> {
+  getGraph(): ScoredGraph {
     const graph = new GraphConstraint();
 
     for (let i = this.tree.length - 1; i >= 0; i--) {
       this.tree[i].passUpstream(graph);
     }
 
-    const completeness = (graph: GraphConstraint): number => {
-      let total = 0;
-      for (let i = 0; i < this.tree.length; i++) {
-        total += this.tree[i].passDownstreamCompleteness(graph);
-      }
-      return total / this.tree.length;
+    // let completenessScore = measure(this.tree, graph, Metric.COMPLETENESS);
+    // let reducedGraph = graph;
+    // let didReduction = false;
+    //
+    // do {
+    //   didReduction = false;
+    //   const maybeGraph = reducedGraph.copy();
+    //   const vArr = [...maybeGraph.vertices];
+    //   vArr.sort((prev, next) => prev.properties.size - next.properties.size);
+    //   for (let i = 0; i < vArr.length && !didReduction; i++) {
+    //     for (let j = i + 1; j < vArr.length && !didReduction; j++) {
+    //       const a = vArr[i];
+    //       const b = vArr[j];
+    //       if (a.canMerge(b) && !maybeGraph.edgeExists(a, b)) {
+    //         maybeGraph.vertices.delete(a);
+    //         maybeGraph.vertices.delete(b);
+    //         const ab = a.merge(b);
+    //         maybeGraph.vertices.add(ab);
+    //         maybeGraph.edges.forEach((e) => {
+    //           if (e.get(FROM)?.value() === a || e.get(FROM)?.value() === b) {
+    //             e.trySet(FROM, new EqConstraint(ab));
+    //           }
+    //           if (e.get(TO)?.value() === a || e.get(TO)?.value() === b) {
+    //             e.trySet(TO, new EqConstraint(ab));
+    //           }
+    //         });
+    //         const maybeCompletenessScore = measure(this.tree, maybeGraph, Metric.COMPLETENESS);
+    //         if (maybeCompletenessScore >= completenessScore) {
+    //           completenessScore = maybeCompletenessScore;
+    //           reducedGraph = maybeGraph;
+    //           didReduction = true;
+    //         }
+    //       }
+    //     }
+    //   }
+    // } while (didReduction);
+
+    let building: ScoredGraph = {
+      graph: new GraphConstraint(),
+      completeness: 0,
+      minimality: 0,
+      addedElement: null
     };
+    let elements = graph.elements();
 
-    let completenessScore = completeness(graph);
-    let reducedGraph = graph;
-    let didReduction = false;
+    console.log('Before merge: ', graph.elements());
 
-    do {
-      didReduction = false;
-      const maybeGraph = reducedGraph.copy();
-      const vArr = [...maybeGraph.vertices];
-      vArr.sort((prev, next) => prev.properties.size - next.properties.size);
-      for (let i = 0; i < vArr.length && !didReduction; i++) {
-        for (let j = i + 1; j < vArr.length && !didReduction; j++) {
-          const a = vArr[i];
-          const b = vArr[j];
-          if (a.canMerge(b) && !maybeGraph.edgeExists(a, b)) {
-            maybeGraph.vertices.delete(a);
-            maybeGraph.vertices.delete(b);
-            const ab = a.merge(b);
-            maybeGraph.vertices.add(ab);
-            maybeGraph.edges.forEach((e) => {
-              if (e.get(FROM)?.value() === a || e.get(FROM)?.value() === b) {
-                e.trySet(FROM, new EqConstraint(ab));
-              }
-              if (e.get(TO)?.value() === a || e.get(TO)?.value() === b) {
-                e.trySet(TO, new EqConstraint(ab));
-              }
-            });
-            const maybeCompletenessScore = completeness(maybeGraph);
-            if (maybeCompletenessScore >= completenessScore) {
-              completenessScore = maybeCompletenessScore;
-              reducedGraph = maybeGraph;
-              didReduction = true;
-            }
-          }
+    while (building.completeness < 1.0 && elements.length > 0) {
+      const candidates: ScoredGraph[] = [];
+      for (let i = 0; i < elements.length; i++) {
+        if (building.graph.canAccept(elements[i])) {
+          const maybeGraph = building.graph.copy();
+          maybeGraph.accept(elements[i]);
+          const maybeCompleteness = measure(this.tree, maybeGraph, Metric.COMPLETENESS);
+          const maybeMinimality = measure(this.tree, maybeGraph, Metric.MINIMALITY);
+          candidates.push({
+            graph: maybeGraph,
+            completeness: maybeCompleteness,
+            minimality: maybeMinimality,
+            addedElement: elements[i]
+          });
+        } else {
+          console.log('couldnt accept', elements[i]);
         }
       }
-    } while (didReduction);
+      if (candidates.length === 0) {
+        break;
+      }
+      candidates.sort((prev, next) =>
+        prev.completeness == next.completeness
+          ? next.minimality - prev.minimality
+          : next.completeness - prev.completeness
+      );
+      building = candidates[0];
+      elements = elements.filter((e) => e !== building.addedElement);
 
-    const allElements = Array.from(reducedGraph.vertices).concat(...reducedGraph.edges);
-    return new Set(allElements);
+      console.log('BUILDING', building);
+    }
+
+    console.log('final building', building.graph);
+
+    return building;
   }
 }
