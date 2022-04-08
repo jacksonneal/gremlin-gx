@@ -18,9 +18,6 @@ export class GraphConstraint {
   }
 
   canAccept(element: ElementConstraint): boolean {
-    if (element.type !== ElementType.VERTEX) {
-      console.log('endpoints exist', this.endpointsExist(element), [...this.vertices]);
-    }
     return element.type === ElementType.VERTEX || this.endpointsExist(element);
   }
 
@@ -37,7 +34,6 @@ export class GraphConstraint {
       this.add(element);
     } else {
       const merged = mostSimilarMergeable.merge(element);
-      console.log("MERGED ELEMENTS: ", element, mostSimilarMergeable, merged);
       this.remove(mostSimilarMergeable);
       this.add(merged);
     }
@@ -49,9 +45,9 @@ export class GraphConstraint {
       return null;
     }
     let mostSimilarMergeable = candidates[0];
-    let minDiff = mostSimilarMergeable.diffScore(element);
+    let minDiff = mostSimilarMergeable.diffKeyScore(element);
     candidates.forEach((candidate) => {
-      const diffScore = candidate.diffScore(element);
+      const diffScore = candidate.diffKeyScore(element);
       if (diffScore < minDiff) {
         mostSimilarMergeable = candidate;
         minDiff = diffScore;
@@ -78,7 +74,9 @@ export class GraphConstraint {
 
   copy(): GraphConstraint {
     const copy = new GraphConstraint();
-    this.elements().map((e) => e.copy()).forEach((e) => copy.add(e));
+    this.elements()
+      .map((e) => e.copy())
+      .forEach((e) => copy.add(e));
     // const vMap = new Map();
     // this.vertices.forEach((v) => {
     //   const vCopy = v.copy();

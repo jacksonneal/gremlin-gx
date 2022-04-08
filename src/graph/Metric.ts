@@ -1,12 +1,12 @@
 import { GraphConstraint } from './GraphConstraint';
 import { Step } from './steps/Step';
-import {ElementConstraint} from "./constraints/ElementConstraint";
+import { ElementConstraint } from './constraints/ElementConstraint';
 
 export interface ScoredGraph {
   graph: GraphConstraint;
   completeness: number;
   minimality: number;
-  addedElement: ElementConstraint | null
+  addedElement: ElementConstraint | null;
 }
 
 export enum Metric {

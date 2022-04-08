@@ -6,8 +6,9 @@ import GremlinGxParser from '../../generated/parser/GremlinGxParser';
 import antlr4 from 'antlr4';
 import { ElementConstraint, ElementType } from './constraints/ElementConstraint';
 import { FROM, TO } from './constants';
+import { ScoredGraph } from './Metric';
 
-export const parse = (input: string) => {
+export const parse = (input: string): ScoredGraph => {
   const chars = new antlr4.InputStream(input);
   const lexer = new GremlinGxLexer(chars);
   const tokens = new antlr4.CommonTokenStream(lexer);
@@ -33,8 +34,6 @@ export const toDataset = (elements: Set<ElementConstraint>): any[] => {
     };
     element.properties.forEach((constraint, key) => {
       if ([TO, FROM].includes(key)) {
-        console.log('Accessing uids for edge endpoints:', constraint.value());
-        console.log(memberIdMap.get(constraint.value()));
         template.data[key] = memberIdMap.get(constraint.value());
       } else {
         template.data[key] = constraint.value();
@@ -45,13 +44,7 @@ export const toDataset = (elements: Set<ElementConstraint>): any[] => {
     // element.merged.forEach((member) => elementMap.set(member, template.data.id));
     return template;
   };
-
   const vertexDataset = [...elements].filter((e) => e.type === ElementType.VERTEX).map(toDataObj);
-
-  console.log('member uids', memberIdMap);
   const edgeDataset = [...elements].filter((e) => e.type === ElementType.EDGE).map(toDataObj);
-
-  console.log(vertexDataset.concat(edgeDataset));
-
   return vertexDataset.concat(edgeDataset);
 };

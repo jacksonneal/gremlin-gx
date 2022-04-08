@@ -22,7 +22,7 @@ export interface ElementConstraint {
 
   merge(other: ElementConstraint): ElementConstraint;
 
-  diffScore(other: ElementConstraint): number;
+  diffKeyScore(other: ElementConstraint): number;
 
   coversId(uid: string): boolean;
 }
@@ -93,14 +93,11 @@ abstract class AbstractElementConstraint implements ElementConstraint {
         mergedElement.trySet(key, value);
       }
     });
-    this.memberUids.forEach((uid) => mergedElement.memberUids.add(uid));
-    other.memberUids.forEach((uid) => mergedElement.memberUids.add(uid));
-    mergedElement.memberUids.add(this.uid);
-    mergedElement.memberUids.add(other.uid);
+    mergedElement.memberUids = new Set([...this.memberUids, this.uid, ...other.memberUids, other.uid]);
     return mergedElement;
   }
 
-  diffScore(other: ElementConstraint): number {
+  diffKeyScore(other: ElementConstraint): number {
     let diff = 0;
     this.properties.forEach((value, key) => {
       if (!other.properties.has(key)) {

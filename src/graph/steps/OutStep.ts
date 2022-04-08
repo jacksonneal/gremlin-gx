@@ -13,74 +13,94 @@ export class OutStep implements Step {
 
   passUpstream(graph: GraphConstraint): void {
     if (graph.head.size === 0) {
+      // Ensure head has at least one element
       graph.head.add(new VertexConstraint());
     }
     const nextHead: Set<ElementConstraint> = new Set();
     const labelsToUse = [...this.labels];
-
     graph.head.forEach((h) => {
+      // Ensure elements in head are vertices
       h.type = ElementType.VERTEX;
+      // Create from->h
       const from = new VertexConstraint();
       const edge = new EdgeConstraint();
       edge.trySet(FROM, new EqConstraint(from.uid));
       edge.trySet(TO, new EqConstraint(h.uid));
-      if (labelsToUse.length > 0) {
+      // Attempt to use labels
+      if (labelsToUse.length) {
         edge.trySet(LABEL, new EqConstraint(labelsToUse.pop()));
       }
+      // Add elements
       graph.vertices.add(h);
       graph.vertices.add(from);
       graph.edges.add(edge);
+      // Move head to from vertices
       nextHead.add(from);
     });
-
+    // Use leftover labels
     labelsToUse.forEach((label) => {
+      // Create from->to
       const from = new VertexConstraint();
       const to = new VertexConstraint();
       const edge = new EdgeConstraint();
       edge.trySet(FROM, new EqConstraint(from.uid));
       edge.trySet(TO, new EqConstraint(to.uid));
       edge.trySet(LABEL, new EqConstraint(label));
+      // Add elements
       graph.vertices.add(from);
       graph.vertices.add(to);
       graph.edges.add(edge);
+      // Move head to from vertices
       nextHead.add(from);
     });
     graph.head = nextHead;
   }
 
-  passDownstreamCompleteness(graph: GraphConstraint): number {
+  passDownstream(graph: GraphConstraint) {
     const nextHead = new Set<ElementConstraint>();
+    const labelsTraversed = new Set<string>();
     graph.head.forEach((h) => {
       graph.edges.forEach((e) => {
-        if (h.coversId(e.get(FROM)?.value()) && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
-          nextHead.add(graph.findVertex(e.get(TO)?.value())!);
+        if (h.coversId(e.get(FROM)?.$eq) && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.$eq))) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          nextHead.add(graph.findVertex(e.get(TO)?.$eq)!);
+          labelsTraversed.add(e.get(LABEL)?.$eq);
         }
       });
     });
-
     graph.head = nextHead;
+    return labelsTraversed;
+  }
 
-    const numShouldHave = Math.max(this.labels.size, 1);
-    return Math.min(1, graph.head.size / numShouldHave);
+  passDownstreamCompleteness(graph: GraphConstraint): number {
+    const labelsTraversed = this.passDownstream(graph);
+    if (this.labels.size > 0) {
+      let included = 0;
+      this.labels.forEach((label) => {
+        if (labelsTraversed.has(label)) {
+          included++;
+        }
+      });
+      // Fraction of included labels
+      return included / this.labels.size;
+    } else {
+      // Must have some elements in head still
+      return Math.min(graph.head.size, 1);
+    }
   }
 
   passDownstreamMinimality(graph: GraphConstraint): number {
-    const nextHead = new Set<ElementConstraint>();
-    graph.head.forEach((h) => {
-      graph.edges.forEach((e) => {
-        if (h.coversId(e.get(FROM)?.value()) && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.value()))) {
-          nextHead.add(graph.findVertex(e.get(TO)?.value())!);
-        }
-      });
-    });
-
-    graph.head = nextHead;
-
+    this.passDownstream(graph);
     if (graph.head.size === 0) {
-      return 0;
+      // This should not happen, but is minimal
+      return 1;
+    }
+    if (this.labels.size > 0) {
+      // Minimal case has one out for each label
+      return Math.min(this.labels.size / graph.head.size, 1);
     } else {
-      const numShouldHave = Math.max(this.labels.size, 1);
-      return Math.min(1, numShouldHave / graph.head.size);
+      // Minimal case has 1 out
+      return 1 / graph.head.size;
     }
   }
 }
