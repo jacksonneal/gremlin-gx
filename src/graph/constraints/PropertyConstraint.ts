@@ -1,4 +1,8 @@
 export interface PropertyConstraint {
+  $eq?: any;
+  $neq?: any;
+  $without?: any;
+
   value(): any;
 
   canMerge(other: PropertyConstraint): boolean;

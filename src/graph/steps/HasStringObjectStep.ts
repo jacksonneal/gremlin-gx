@@ -14,63 +14,54 @@ export class HasStringObjectStep implements Step {
 
   passUpstream(graph: GraphConstraint): void {
     if (graph.head.size === 0) {
+      // Ensure head has at least one element
       graph.head.add(new StructConstraint());
     }
-
     graph.head.forEach((h) => {
+      // Make all head elements pass the filter
       h.trySet(this.key, new EqConstraint(this.value));
     });
-
+    // Add an element to fail the filter
     const failElement = new StructConstraint();
     failElement.trySet(this.key, new NeqConstraint(this.value));
     graph.head.add(failElement);
   }
 
-  passDownstreamCompleteness(graph: GraphConstraint): number {
+  passDownstream(graph: GraphConstraint): [number, number] {
     const nextHead = new Set<ElementConstraint>();
-    let pass = false;
-    let fail = false;
+    let pass = 0;
+    let fail = 0;
     graph.head.forEach((h) => {
-      if (h.get(this.key)?.value() === this.value) {
-        pass = true;
+      if (h.get(this.key)?.$eq === this.value) {
+        // Add passing elements to head
         nextHead.add(h);
-      } else if (h.get(this.key)?.value() !== this.value) {
-        fail = true;
+        pass++;
+      } else {
+        fail++;
       }
     });
     graph.head = nextHead;
+    return [pass, fail];
+  }
 
-    let ret = 0;
-    if (pass) {
-      ret++;
+  passDownstreamCompleteness(graph: GraphConstraint): number {
+    const [pass, fail]: [number, number] = this.passDownstream(graph);
+    if (pass > 0 && fail > 0) {
+      return 1;
+    } else if (pass > 0 || fail > 0) {
+      return 1 / 2;
+    } else {
+      return 0;
     }
-    if (fail) {
-      ret++;
-    }
-    return ret / 2;
   }
 
   passDownstreamMinimality(graph: GraphConstraint): number {
-    const nextHead = new Set<ElementConstraint>();
-    let pass = false;
-    let fail = false;
-    graph.head.forEach((h) => {
-      if (h.get(this.key)?.value() === this.value) {
-        pass = true;
-        nextHead.add(h);
-      } else if (h.get(this.key)?.value() !== this.value) {
-        fail = true;
-      }
-    });
-    graph.head = nextHead;
-
-    let ret = 0;
-    if (pass) {
-      ret++;
+    const [pass, fail]: [number, number] = this.passDownstream(graph);
+    if (pass === 0 && fail == 0) {
+      // This should not happen, but is minimal
+      return 1;
     }
-    if (fail) {
-      ret++;
-    }
-    return ret / 2;
+    // Minimal case has 1 pass and 1 fail
+    return Math.min(2 / pass + fail, 1);
   }
 }

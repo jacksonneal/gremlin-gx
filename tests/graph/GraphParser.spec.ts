@@ -63,8 +63,8 @@ describe('traversalMethod_out', () => {
   test('g.V().out(labels)', () => {
     const label0 = 'knows';
     const label1 = 'likes';
-    const graph = GraphParser.parse(`g.V().out('${label0}', '${label1}')`);
-    const elements = [...graph];
+    const graph = GraphParser.parse(`g.V().out('${label0}', '${label1}')`).graph;
+    const elements = graph.elements();
     const vCount = elements.filter((e) => e.type === ElementType.VERTEX).length;
     const eCount = elements.filter((e) => e.type === ElementType.EDGE).length;
     const labelCount0 = elements.filter((e) => e.get(LABEL)?.value() === label0).length;
@@ -80,8 +80,8 @@ describe('traversalMethod_has', () => {
   test('g.V().has(key, val)', () => {
     const key = 'name';
     const value = 'sam';
-    const graph = GraphParser.parse(`g.V().has('${key}', '${value}')`);
-    const elements = [...graph];
+    const graph = GraphParser.parse(`g.V().has('${key}', '${value}')`).graph;
+    const elements = graph.elements();
     const vCount = elements.filter((e) => e.type === ElementType.VERTEX).length;
     const valCount = elements.filter((e) => e.get(key)?.value() === value).length;
     expect(vCount).toBe(2);
@@ -91,8 +91,8 @@ describe('traversalMethod_has', () => {
   test('g.V().out().has(key, val)', () => {
     const key = 'name';
     const value = 'sam';
-    const graph = GraphParser.parse(`g.V().out().has('${key}', '${value}')`);
-    const elements = [...graph];
+    const graph = GraphParser.parse(`g.V().out().has('${key}', '${value}')`).graph;
+    const elements = graph.elements();
     const vCount = elements.filter((e) => e.type === ElementType.VERTEX).length;
     const eCount = elements.filter((e) => e.type === ElementType.EDGE).length;
     const valCount = elements.filter((e) => e.get(key)?.value() === value).length;
