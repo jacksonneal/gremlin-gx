@@ -108,7 +108,11 @@ const onContentLoaded = () => {
 
   (<any>$('.tooltip')).tooltipster();
 
-  $query.val('g.V()');
+  $query.val('g.V().out().out().has(\'name\', \'Jax\')');
+
+  cy.on('select', (e) => {
+    console.log(e.target.data());
+  });
 
   tryPromise(applyGraphFromInput).then(applyLayout);
 };

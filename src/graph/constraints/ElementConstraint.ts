@@ -1,4 +1,5 @@
 import { PropertyConstraint } from './PropertyConstraint';
+import { FROM, ID, TO } from '../constants';
 
 export enum ElementType {
   VERTEX = 'VERTEX',
@@ -72,10 +73,12 @@ abstract class AbstractElementConstraint implements ElementConstraint {
       return false;
     }
     let canMerge = true;
-    this.properties.forEach((value, key) => {
+    this.properties.forEach((property, key) => {
       const otherProperty = other.get(key);
-      if (otherProperty && !value.canMerge(otherProperty)) {
-        canMerge = false;
+      if (otherProperty) {
+        if (!property.canMerge(otherProperty)) {
+          canMerge = false;
+        }
       }
     });
     return canMerge;

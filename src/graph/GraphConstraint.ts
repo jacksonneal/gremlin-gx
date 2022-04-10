@@ -1,6 +1,6 @@
-import { ElementConstraint, ElementType } from './constraints/ElementConstraint';
-import { FROM, TO } from './constants';
-import { EqConstraint } from './constraints/PropertyConstraint';
+import {ElementConstraint, ElementType} from './constraints/ElementConstraint';
+import {FROM, TO} from './constants';
+import {EqConstraint} from "./constraints/PropertyConstraint";
 
 export class GraphConstraint {
   vertices: Set<ElementConstraint>;
@@ -23,12 +23,16 @@ export class GraphConstraint {
 
   endpointsExist(e: ElementConstraint): boolean {
     const vertexArr = [...this.vertices];
-    const fromId: string = e.get(FROM)?.value();
-    const toId: string = e.get(TO)?.value();
+    const fromId: string = e.get(FROM)?.$eq;
+    const toId: string = e.get(TO)?.$eq;
     return vertexArr.some((v) => v.coversId(fromId)) && vertexArr.some((v) => v.coversId(toId));
   }
 
   accept(element: ElementConstraint) {
+    if (element.type === ElementType.EDGE) {
+      element.trySet(FROM, new EqConstraint(this.findVertex(element.get(FROM)?.$eq)?.uid));
+      element.trySet(TO, new EqConstraint(this.findVertex(element.get(TO)?.$eq)?.uid));
+    }
     const mostSimilarMergeable = this.findMostSimilar(element);
     if (mostSimilarMergeable === null) {
       this.add(element);
@@ -36,6 +40,10 @@ export class GraphConstraint {
       const merged = mostSimilarMergeable.merge(element);
       this.remove(mostSimilarMergeable);
       this.add(merged);
+      this.edges.forEach((e) => {
+        e.trySet(FROM, new EqConstraint(this.findVertex(e.get(FROM)?.$eq)?.uid));
+        e.trySet(TO, new EqConstraint(this.findVertex(e.get(TO)?.$eq)?.uid));
+      });
     }
   }
 
