@@ -1,4 +1,5 @@
 import { PropertyConstraint } from './PropertyConstraint';
+import { v4 as uuidv4 } from 'uuid';
 import { FROM, ID, TO } from '../constants';
 
 export enum ElementType {
@@ -11,7 +12,9 @@ export interface ElementConstraint {
   uid: string;
   memberUids: Set<string>;
   properties: Map<string, PropertyConstraint>;
+  annotations: Set<string>;
   type: ElementType;
+  count: number;
 
   copy(): ElementConstraint;
 
@@ -42,14 +45,18 @@ export const elementConstraintFactory = (type: ElementType) => {
 abstract class AbstractElementConstraint implements ElementConstraint {
   uid: string;
   memberUids: Set<string>;
-  type: ElementType;
   properties: Map<string, PropertyConstraint>;
+  annotations: Set<string>;
+  type: ElementType;
+  count: number;
 
   protected constructor(type: ElementType) {
-    this.uid = (<any>crypto).randomUUID();
+    this.uid = uuidv4();
     this.memberUids = new Set();
-    this.properties = new Map<string, PropertyConstraint>();
+    this.properties = new Map();
+    this.annotations = new Set();
     this.type = type;
+    this.count = 1;
   }
 
   copy(): ElementConstraint {
@@ -57,6 +64,7 @@ abstract class AbstractElementConstraint implements ElementConstraint {
     copy.uid = this.uid;
     copy.memberUids = new Set(this.memberUids);
     this.properties.forEach((val, key) => copy.trySet(key, val));
+    copy.annotations = new Set(this.annotations);
     return copy;
   }
 
@@ -81,11 +89,19 @@ abstract class AbstractElementConstraint implements ElementConstraint {
         }
       }
     });
+    if (
+      !(
+        this.annotations.size === other.annotations.size && [...this.annotations].every((a) => other.annotations.has(a))
+      )
+    ) {
+      canMerge = false;
+    }
     return canMerge;
   }
 
   merge(other: ElementConstraint): ElementConstraint {
     const mergedElement = elementConstraintFactory(this.type);
+    mergedElement.memberUids = new Set([...this.memberUids, this.uid, ...other.memberUids, other.uid]);
     this.properties.forEach((value, key) => {
       const otherProperty = other.get(key);
       const mergedProperty = otherProperty ? value.merge(otherProperty) : value;
@@ -96,7 +112,7 @@ abstract class AbstractElementConstraint implements ElementConstraint {
         mergedElement.trySet(key, value);
       }
     });
-    mergedElement.memberUids = new Set([...this.memberUids, this.uid, ...other.memberUids, other.uid]);
+    mergedElement.annotations = new Set([...this.annotations, ...other.annotations]);
     return mergedElement;
   }
 

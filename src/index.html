@@ -20,7 +20,7 @@
 
       <label for="query" class="tooltip u-pull-left" title="Switch to generate new example graph">Active query</label>
       <div class="u-cf">
-        <textarea id="query" name="query" rows="2" cols="30"></textarea>
+        <textarea id="query" name="query" rows="2" cols="40"></textarea>
       </div>
 
       <div class="u-cf">
@@ -31,6 +31,24 @@
       <div class="u-cf">
         <h3>Minimality:</h3>
         <h3 id="minimality"></h3>
+      </div>
+
+      <div class="u-cf">
+        <h4>Merging</h4>
+        <form>
+          <label for="merge-off" class="tooltip u-pull-left" title="Disable vertex merging process">
+            <input type="radio" id="merge-off" name="merge-level" value="off" />
+            off </label
+          ><br />
+          <label for="merge-no-self-loop" class="tooltip u-pull-left" title="Merge without allowing self-loops">
+            <input type="radio" id="merge-no-self-loop" name="merge-level" value="no-self-loop" />
+            no self-loop </label
+          ><br />
+          <label for="merge-full" class="tooltip u-pull-left" title="Enable vertex merging process">
+            <input type="radio" id="merge-full" name="merge-level" value="full" checked />
+            full</label
+          >
+        </form>
       </div>
     </div>
 

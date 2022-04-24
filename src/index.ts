@@ -10,6 +10,7 @@ import 'font-awesome/css/font-awesome.css';
 import 'tooltipster/dist/js/tooltipster.bundle.min.js';
 import 'tooltipster/dist/css/tooltipster.bundle.min.css';
 import { ScoredGraph } from './graph/Metric';
+import _ from 'lodash';
 
 const onContentLoaded = () => {
   $('body').show();
@@ -66,7 +67,10 @@ const onContentLoaded = () => {
     });
 
   const $query = $(`#query`);
-  const getGraph = (query): ScoredGraph => parse(query);
+  const getGraph = (query): ScoredGraph => {
+    const $merge = $(`input[name='merge-level']:checked`);
+    return parse(query, $merge.val());
+  };
   const applyGraph = (res: ScoredGraph) => {
     const dataset = toDataset(new Set(res.graph.elements()));
     cy.zoom(0.001);
@@ -87,14 +91,14 @@ const onContentLoaded = () => {
     edgeLengthVal: 45,
     animate: true,
     randomize: true,
-    maxSimulationTime: maxLayoutDuration,
-    boundingBox: {
-      // to give cola more space to resolve initial overlaps
-      x1: 0,
-      y1: 0,
-      x2: 10000,
-      y2: 10000
-    }
+    maxSimulationTime: maxLayoutDuration
+    // boundingBox: {
+    //   // to give cola more space to resolve initial overlaps
+    //   x1: 0,
+    //   y1: 0,
+    //   x2: 10000,
+    //   y2: 10000
+    // }
   };
 
   const applyLayout = () => {
@@ -102,13 +106,20 @@ const onContentLoaded = () => {
     return l.run();
   };
 
-  $query.on('input', () => {
-    tryPromise(applyGraphFromInput).then(applyLayout);
-  });
+  $query.on(
+    'input',
+    _.debounce(() => tryPromise(applyGraphFromInput).then(applyLayout), 500)
+  );
+
+  const $merge = $(`input[name='merge-level']`);
+  $merge.on(
+    'change',
+    _.debounce(() => tryPromise(applyGraphFromInput).then(applyLayout), 100)
+  );
 
   (<any>$('.tooltip')).tooltipster();
 
-  $query.val('g.V().out().out().has(\'name\', \'Jax\')');
+  $query.val(`g.V().as('a').out().where(P.neq('a')).out()`);
 
   cy.on('select', (e) => {
     console.log(e.target.data());
