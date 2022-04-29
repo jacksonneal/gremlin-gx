@@ -11,6 +11,7 @@ import 'tooltipster/dist/js/tooltipster.bundle.min.js';
 import 'tooltipster/dist/css/tooltipster.bundle.min.css';
 import { ScoredGraph } from './graph/Metric';
 import _ from 'lodash';
+import {animate} from "./graph/animate";
 
 const onContentLoaded = () => {
   $('body').show();
@@ -111,8 +112,7 @@ const onContentLoaded = () => {
     _.debounce(() => tryPromise(applyGraphFromInput).then(applyLayout), 500)
   );
 
-  const $merge = $(`input[name='merge-level']`);
-  $merge.on(
+  $(`input[name='merge-level']`).on(
     'change',
     _.debounce(() => tryPromise(applyGraphFromInput).then(applyLayout), 100)
   );
@@ -123,6 +123,15 @@ const onContentLoaded = () => {
 
   cy.on('select', (e) => {
     console.log(e.target.data());
+  });
+
+  $(`#format`).on('click', () => {
+    alert('do formatting');
+  });
+
+  $(`#animate`).on('click', () => {
+    animate(cy, )
+    alert('do animation');
   });
 
   tryPromise(applyGraphFromInput).then(applyLayout);
