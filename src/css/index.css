@@ -42,6 +42,10 @@ body {
   cursor: pointer;
 }
 
+textarea {
+  resize: vertical;
+}
+
 h1 {
   margin: 0 0.125em;
   position: absolute;

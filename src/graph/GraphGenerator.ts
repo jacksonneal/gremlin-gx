@@ -1,14 +1,14 @@
 import GremlinGxListener from '../../generated/parser/GremlinGxListener';
-import { GraphConstraint } from './GraphConstraint';
-import { Step } from './steps/Step';
-import { VStep } from './steps/VStep';
-import { OutStep } from './steps/OutStep';
-import { HasStringObjectStep } from './steps/HasStringObjectStep';
-import { measure, Metric, ScoredGraph } from './Metric';
-import { TraversalPredicate, WherePStep } from './steps/WherePStep';
-import { AsStep } from './steps/AsStep';
-import { AggregateStringStep } from './steps/AggregateStringStep';
-import { GroupCountEmptyStep } from './steps/GroupCountEmptyStep';
+import {GraphConstraint} from './GraphConstraint';
+import {Step} from './steps/Step';
+import {VStep} from './steps/VStep';
+import {OutStep} from './steps/OutStep';
+import {HasStringObjectStep} from './steps/HasStringObjectStep';
+import {measure, Metric, ScoredGraph} from './Metric';
+import {TraversalPredicate, WherePStep} from './steps/WherePStep';
+import {AsStep} from './steps/AsStep';
+import {AggregateStringStep} from './steps/AggregateStringStep';
+import {GroupCountEmptyStep} from './steps/GroupCountEmptyStep';
 import * as $C from 'js-combinatorics';
 
 export default class GraphGenerator extends GremlinGxListener {
@@ -93,7 +93,7 @@ export default class GraphGenerator extends GremlinGxListener {
     this.tree.push(new GroupCountEmptyStep());
   }
 
-  getGraph(mergeLevel: any): ScoredGraph {
+  getGraph(mergeLevel: any): [ScoredGraph, Step[]] {
     console.log('MERGE-LEVEL', mergeLevel);
     const skipMerge = mergeLevel === 'off';
     const mergeNeighbors = mergeLevel !== 'no-self-loop';
@@ -181,7 +181,7 @@ export default class GraphGenerator extends GremlinGxListener {
 
     console.log('SORTED-CANDIDATES', candidates);
 
-    return candidates[0];
+    return [candidates[0], this.tree];
 
     // let reduced: ScoredGraph = {
     //   graph: new GraphConstraint(),

@@ -4,11 +4,12 @@ import GremlinGxParser from '../../generated/parser/GremlinGxParser';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import antlr4 from 'antlr4';
-import { ElementConstraint, ElementType } from './constraints/ElementConstraint';
-import { FROM, TO } from './constants';
-import { ScoredGraph } from './Metric';
+import {ElementConstraint, ElementType} from './constraints/ElementConstraint';
+import {FROM, TO} from './constants';
+import {ScoredGraph} from './Metric';
+import {Step} from "./steps/Step";
 
-export const parse = (input: string, mergeLevel: any): ScoredGraph => {
+export const parse = (input: string, mergeLevel: any): [ScoredGraph, Step[]] => {
   const chars = new antlr4.InputStream(input);
   const lexer = new GremlinGxLexer(chars);
   const tokens = new antlr4.CommonTokenStream(lexer);
