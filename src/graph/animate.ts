@@ -1,5 +1,5 @@
-import {Step} from './steps/Step';
-import {GraphConstraint} from './GraphConstraint';
+import { Step } from './steps/Step';
+import { GraphConstraint } from './GraphConstraint';
 
 export const animate = (cy: any, tree: Step[], graph: GraphConstraint) => {
   let i = 0;
@@ -13,6 +13,6 @@ export const animate = (cy: any, tree: Step[], graph: GraphConstraint) => {
       i++;
       setTimeout(highlightHead, 1000);
     }
-  }
-  highlightHead()
-}
+  };
+  highlightHead();
+};

@@ -1,14 +1,14 @@
 import GremlinGxListener from '../../generated/parser/GremlinGxListener';
-import {GraphConstraint} from './GraphConstraint';
-import {Step} from './steps/Step';
-import {VStep} from './steps/VStep';
-import {OutStep} from './steps/OutStep';
-import {HasStringObjectStep} from './steps/HasStringObjectStep';
-import {measure, Metric, ScoredGraph} from './Metric';
-import {TraversalPredicate, WherePStep} from './steps/WherePStep';
-import {AsStep} from './steps/AsStep';
-import {AggregateStringStep} from './steps/AggregateStringStep';
-import {GroupCountEmptyStep} from './steps/GroupCountEmptyStep';
+import { GraphConstraint } from './GraphConstraint';
+import { Step } from './steps/Step';
+import { VStep } from './steps/VStep';
+import { OutStep } from './steps/OutStep';
+import { HasStringObjectStep } from './steps/HasStringObjectStep';
+import { measure, Metric, ScoredGraph } from './Metric';
+import { TraversalPredicate, WherePStep } from './steps/WherePStep';
+import { AsStep } from './steps/AsStep';
+import { AggregateStringStep } from './steps/AggregateStringStep';
+import { GroupCountEmptyStep } from './steps/GroupCountEmptyStep';
 import * as $C from 'js-combinatorics';
 
 export default class GraphGenerator extends GremlinGxListener {
