@@ -3,6 +3,7 @@ import { GraphConstraint } from '../GraphConstraint';
 import { EdgeConstraint, ElementConstraint, ElementType, VertexConstraint } from '../constraints/ElementConstraint';
 import { FROM, LABEL, TO } from '../constants';
 import { EqConstraint } from '../constraints/PropertyConstraint';
+import { v4 as uuidv4 } from 'uuid';
 
 export class OutStep implements Step {
   private readonly labels: Set<string>;
@@ -18,24 +19,29 @@ export class OutStep implements Step {
     }
     const nextHead: Set<ElementConstraint> = new Set();
     const labelsToUse = [...this.labels];
+    console.log('OUT:HEAD', graph.head.size);
     graph.head.forEach((h) => {
       // Ensure elements in head are vertices
       h.type = ElementType.VERTEX;
-      // Create from->h
-      const from = new VertexConstraint();
-      const edge = new EdgeConstraint();
-      edge.trySet(FROM, new EqConstraint(from.uid));
-      edge.trySet(TO, new EqConstraint(h.uid));
-      // Attempt to use labels
-      if (labelsToUse.length) {
-        edge.trySet(LABEL, new EqConstraint(labelsToUse.pop()));
-      }
-      // Add elements
+      const unique = uuidv4();
       graph.vertices.add(h);
-      graph.vertices.add(from);
-      graph.edges.add(edge);
-      // Move head to from vertices
-      nextHead.add(from);
+      for (let i = 0; i < h.count; i++) {
+        // Create from->h
+        const from = new VertexConstraint();
+        from.trySet(unique, new EqConstraint(i));
+        const edge = new EdgeConstraint();
+        edge.trySet(FROM, new EqConstraint(from.uid));
+        edge.trySet(TO, new EqConstraint(h.uid));
+        // Attempt to use labels
+        if (labelsToUse.length) {
+          edge.trySet(LABEL, new EqConstraint(labelsToUse.pop()));
+        }
+        // Add elements
+        graph.vertices.add(from);
+        graph.edges.add(edge);
+        // Move head to from vertices
+        nextHead.add(from);
+      }
     });
     // Use leftover labels
     labelsToUse.forEach((label) => {
@@ -53,7 +59,9 @@ export class OutStep implements Step {
       // Move head to from vertices
       nextHead.add(from);
     });
+    console.log('OUT:NEXT-HEAD', nextHead.size);
     graph.head = nextHead;
+    console.log('OUT:GRAPH', graph);
   }
 
   passDownstream(graph: GraphConstraint) {
@@ -63,7 +71,12 @@ export class OutStep implements Step {
       graph.edges.forEach((e) => {
         if (h.coversId(e.get(FROM)?.$eq) && (this.labels.size === 0 || this.labels.has(e.get(LABEL)?.$eq))) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          nextHead.add(graph.findVertex(e.get(TO)?.$eq)!);
+          const toAdd = graph.findVertex(e.get(TO)?.$eq)!;
+          if (nextHead.has(toAdd)) {
+            toAdd.count++;
+          } else {
+            nextHead.add(toAdd);
+          }
           labelsTraversed.add(e.get(LABEL)?.$eq);
         }
       });

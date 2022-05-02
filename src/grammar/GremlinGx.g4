@@ -171,9 +171,9 @@ traversalMethod
 //	| traversalMethod_addV
 //	| traversalMethod_mergeE
 //	| traversalMethod_mergeV
-//	| traversalMethod_aggregate
+	: traversalMethod_aggregate
 //	| traversalMethod_and
-//	| traversalMethod_as
+	| traversalMethod_as
 //	| traversalMethod_barrier
 //	| traversalMethod_both
 //	| traversalMethod_bothE
@@ -197,8 +197,8 @@ traversalMethod
 //	| traversalMethod_fold
 //	| traversalMethod_from
 //	| traversalMethod_group
-//	| traversalMethod_groupCount
-	: traversalMethod_has
+	| traversalMethod_groupCount
+	| traversalMethod_has
 //	| traversalMethod_hasId
 //	| traversalMethod_hasKey
 //	| traversalMethod_hasLabel
@@ -267,7 +267,7 @@ traversalMethod
 //	| traversalMethod_value
 //	| traversalMethod_valueMap
 //	| traversalMethod_values
-//	| traversalMethod_where
+	| traversalMethod_where
 //	| traversalMethod_with
 //	| traversalMethod_write
 	;
@@ -298,20 +298,20 @@ traversalMethod
 //    | 'mergeE' LPAREN (genericLiteralMap | nullLiteral) RPAREN #traversalMethod_mergeE_Map
 //    | 'mergeE' LPAREN nestedTraversal RPAREN #traversalMethod_mergeE_Traversal
 //    ;
-//
-//traversalMethod_aggregate
+
+traversalMethod_aggregate
 //	: 'aggregate' LPAREN traversalScope COMMA stringLiteral RPAREN #traversalMethod_aggregate_Scope_String
-//	| 'aggregate' LPAREN stringLiteral RPAREN #traversalMethod_aggregate_String
-//	;
-//
+	: 'aggregate' LPAREN stringLiteral RPAREN #traversalMethod_aggregate_String
+	;
+
 //traversalMethod_and
 //	: 'and' LPAREN nestedTraversalList RPAREN
 //	;
-//
-//traversalMethod_as
-//	: 'as' LPAREN stringLiteral (COMMA stringLiteralList)? RPAREN
-//	;
-//
+
+traversalMethod_as
+	: 'as' LPAREN stringLiteral (COMMA stringLiteralList)? RPAREN
+	;
+
 //traversalMethod_barrier
 //	: 'barrier' LPAREN traversalSackMethod RPAREN #traversalMethod_barrier_Consumer
 //	| 'barrier' LPAREN RPAREN #traversalMethod_barrier_Empty
@@ -428,11 +428,11 @@ traversalMethod
 //	: 'group' LPAREN RPAREN #traversalMethod_group_Empty
 //	| 'group' LPAREN stringLiteral RPAREN #traversalMethod_group_String
 //	;
-//
-//traversalMethod_groupCount
-//	: 'groupCount' LPAREN RPAREN #traversalMethod_groupCount_Empty
+
+traversalMethod_groupCount
+	: 'groupCount' LPAREN RPAREN #traversalMethod_groupCount_Empty
 //	| 'groupCount' LPAREN stringLiteral RPAREN #traversalMethod_groupCount_String
-//	;
+	;
 
 traversalMethod_has
 //	: 'has' LPAREN stringLiteral RPAREN #traversalMethod_has_String
@@ -759,13 +759,13 @@ traversalMethod_out
 //traversalMethod_values
 //	: 'values' LPAREN stringLiteralList RPAREN
 //	;
-//
-//traversalMethod_where
-//	: 'where' LPAREN traversalPredicate RPAREN #traversalMethod_where_P
+
+traversalMethod_where
+	: 'where' LPAREN traversalPredicate RPAREN #traversalMethod_where_P
 //	| 'where' LPAREN stringLiteral COMMA traversalPredicate RPAREN #traversalMethod_where_String_P
 //	| 'where' LPAREN nestedTraversal RPAREN #traversalMethod_where_Traversal
-//	;
-//
+	;
+
 //traversalMethod_with
 //	: 'with' LPAREN stringLiteral RPAREN #traversalMethod_with_String
 //	| 'with' LPAREN stringLiteral COMMA genericLiteral RPAREN #traversalMethod_with_String_Object
@@ -921,10 +921,10 @@ traversalMethod_out
 //    : 'any' | 'Pick.any'
 //    | 'none' | 'Pick.none'
 //    ;
-//
-//traversalPredicate
-//    : traversalPredicate_eq
-//    | traversalPredicate_neq
+
+traversalPredicate
+    : traversalPredicate_eq
+    | traversalPredicate_neq
 //    | traversalPredicate_lt
 //    | traversalPredicate_lte
 //    | traversalPredicate_gt
@@ -933,7 +933,7 @@ traversalMethod_out
 //    | traversalPredicate_outside
 //    | traversalPredicate_between
 //    | traversalPredicate_within
-//    | traversalPredicate_without
+    | traversalPredicate_without
 //    | traversalPredicate_not
 //    | traversalPredicate_startingWith
 //    | traversalPredicate_notStartingWith
@@ -946,8 +946,8 @@ traversalMethod_out
 //    | traversalPredicate DOT 'and' LPAREN traversalPredicate RPAREN
 //    | traversalPredicate DOT 'or' LPAREN traversalPredicate RPAREN
 //    | traversalPredicate DOT 'negate' LPAREN RPAREN
-//    ;
-//
+    ;
+
 //traversalTerminalMethod
 //    : traversalTerminalMethod_explain
 //    | traversalTerminalMethod_iterate
@@ -982,15 +982,15 @@ traversalMethod_out
 //traversalBiFunction
 //    : traversalOperator
 //    ;
-//
-//traversalPredicate_eq
-//    : ('P.eq' | 'eq') LPAREN genericLiteral RPAREN
-//    ;
-//
-//traversalPredicate_neq
-//    : ('P.neq' | 'neq') LPAREN genericLiteral RPAREN
-//    ;
-//
+
+traversalPredicate_eq
+    : ('P.eq' | 'eq') LPAREN genericLiteral RPAREN
+    ;
+
+traversalPredicate_neq
+    : ('P.neq' | 'neq') LPAREN genericLiteral RPAREN
+    ;
+
 //traversalPredicate_lt
 //    : ('P.lt' | 'lt') LPAREN genericLiteral RPAREN
 //    ;
@@ -1023,12 +1023,12 @@ traversalMethod_out
 //    : ('P.within' | 'within') LPAREN RPAREN
 //    | ('P.within' | 'within') LPAREN genericLiteralList RPAREN
 //    ;
-//
-//traversalPredicate_without
+
+traversalPredicate_without
 //    : ('P.without' | 'without') LPAREN RPAREN
-//    | ('P.without' | 'without') LPAREN genericLiteralList RPAREN
-//    ;
-//
+    : ('P.without' | 'without') LPAREN genericLiteralList RPAREN
+    ;
+
 //traversalPredicate_not
 //    : ('P.not' | 'not') LPAREN traversalPredicate RPAREN
 //    ;

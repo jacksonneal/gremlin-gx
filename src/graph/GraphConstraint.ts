@@ -1,6 +1,6 @@
-import {ElementConstraint, ElementType} from './constraints/ElementConstraint';
-import {FROM, TO} from './constants';
-import {EqConstraint} from "./constraints/PropertyConstraint";
+import { ElementConstraint, ElementType } from './constraints/ElementConstraint';
+import { FROM, TO } from './constants';
+import { EqConstraint } from './constraints/PropertyConstraint';
 
 export class GraphConstraint {
   vertices: Set<ElementConstraint>;
@@ -13,8 +13,42 @@ export class GraphConstraint {
     this.head = new Set<ElementConstraint>();
   }
 
+  mergeVertices(aUid: string, bUid: string) {
+    const a = this.findVertex(aUid);
+    const b = this.findVertex(bUid);
+    if (a == null || b == null) {
+      return;
+    }
+    this.vertices.delete(a);
+    this.vertices.delete(b);
+    const ab = a.merge(b);
+    this.add(ab);
+    this.edges.forEach((e) => {
+      e.trySet(FROM, new EqConstraint(this.findVertex(e.get(FROM)?.$eq)?.uid));
+      e.trySet(TO, new EqConstraint(this.findVertex(e.get(TO)?.$eq)?.uid));
+    });
+    return 0;
+  }
+
+  mergeEdges(aUid: string, bUid: string) {
+    const a = this.findEdge(aUid);
+    const b = this.findEdge(bUid);
+    if (a == null || b == null) {
+      return;
+    }
+    this.edges.delete(a);
+    this.edges.delete(b);
+    const ab = a.merge(b);
+    this.add(ab);
+    this.edges.forEach((e) => {
+      e.trySet(FROM, new EqConstraint(this.findVertex(e.get(FROM)?.$eq)?.uid));
+      e.trySet(TO, new EqConstraint(this.findVertex(e.get(TO)?.$eq)?.uid));
+    });
+    return 0;
+  }
+
   elements(): ElementConstraint[] {
-    return [...this.vertices].concat([...this.edges]);
+    return [...new Set([...this.vertices, ...this.edges, ...this.head])];
   }
 
   canAccept(element: ElementConstraint): boolean {
@@ -34,16 +68,16 @@ export class GraphConstraint {
       element.trySet(TO, new EqConstraint(this.findVertex(element.get(TO)?.$eq)?.uid));
     }
     const mostSimilarMergeable = this.findMostSimilar(element);
-    if (mostSimilarMergeable === null) {
+    if (true || mostSimilarMergeable === null) {
       this.add(element);
     } else {
-      const merged = mostSimilarMergeable.merge(element);
-      this.remove(mostSimilarMergeable);
-      this.add(merged);
-      this.edges.forEach((e) => {
-        e.trySet(FROM, new EqConstraint(this.findVertex(e.get(FROM)?.$eq)?.uid));
-        e.trySet(TO, new EqConstraint(this.findVertex(e.get(TO)?.$eq)?.uid));
-      });
+      // const merged = mostSimilarMergeable.merge(element);
+      // this.remove(mostSimilarMergeable);
+      // this.add(merged);
+      // this.edges.forEach((e) => {
+      //   e.trySet(FROM, new EqConstraint(this.findVertex(e.get(FROM)?.$eq)?.uid));
+      //   e.trySet(TO, new EqConstraint(this.findVertex(e.get(TO)?.$eq)?.uid));
+      // });
     }
   }
 
@@ -104,16 +138,20 @@ export class GraphConstraint {
     return [...this.vertices].find((v) => v.coversId(uid));
   }
 
-  // edgeExists(a: ElementConstraint, b: ElementConstraint): boolean {
-  //   let exists = false;
-  //   this.edges.forEach((e) => {
-  //     if (
-  //       (e.get(FROM)?.value() === a && e.get(TO)?.value() === b) ||
-  //       (e.get(TO)?.value() === a && e.get(FROM)?.value() === b)
-  //     ) {
-  //       exists = true;
-  //     }
-  //   });
-  //   return exists;
-  // }
+  findEdge(uid: string): ElementConstraint | undefined {
+    return [...this.edges].find((v) => v.coversId(uid));
+  }
+
+  edgeExists(a: ElementConstraint, b: ElementConstraint): boolean {
+    let exists = false;
+    this.edges.forEach((e) => {
+      if (
+        (a.coversId(e.get(FROM)?.$eq) && b.coversId(e.get(TO)?.$eq)) ||
+        (a.coversId(e.get(TO)?.$eq) && b.coversId(e.get(FROM)?.$eq))
+      ) {
+        exists = true;
+      }
+    });
+    return exists;
+  }
 }

@@ -13,13 +13,13 @@ Jackson Neal
 
 External Components:
 
-- Download ANTLR tool [antlr-4.9.3-complete.jar](https://www.antlr.org/download.html), place in `resources` directory.
+- Download ANTLR tool [antlr-4.9.3-complete.jar](https://www.antlr.org/download.html), place in `./resources` directory.
 
 Dependencies:
 
 ```bash
 # Install dependencies
-> npm install
+npm install
 ```
 
 ## Execution
@@ -27,31 +27,32 @@ Dependencies:
 1. Use ANTLR to generate parser for grammar `./src/grammar/GremlinGx.g4`
 
 ```bash
-> npm run generate
+npm run generate
 ```
 
 2. Build with Webpack
 
 ```bash
-> npm run build
+npm run build
 ```
 
 ## Development
 
-Run Webpack with serve in dev mode with hot reload
+Run Webpack serve in dev mode with hot reload
 
 ```bash
-> npm run dev
+npm run dev
 ```
 
 ## Testing
 
 ```bash
 # Run Jest test suite
-> npm test
-
+npm test
+```
+```bash
 # With coverage
-> npm run test-coverage
+npm run test-coverage
 ```
 
 ## Lint & Format
@@ -60,14 +61,17 @@ Run Webpack with serve in dev mode with hot reload
 
 ```bash
 # ESLint check
-> npm run lint-check
-
+npm run lint-check
+```
+```bash
 # ESLint fix
-> npm run lint
-
+npm run lint
+````
+```bash
 # Prettier check
-> npm run format-check
-
+npm run format-check
+```
+```bash
 # Prettier format
-> npm run format
+npm run format
 ```

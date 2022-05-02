@@ -30,20 +30,20 @@ describe('element constraint', () => {
     expect(pc).toBe(copyEc.get(key));
   });
 
-  // test(`canMerge`, () => {
-  //   const v0 = new VertexConstraint();
-  //   const v1 = new VertexConstraint();
-  //   const e = new EdgeConstraint();
-  //   const pc0 = new EqConstraint(1);
-  //   v0.trySet('key', pc0);
-  //   v1.trySet('key', pc0);
-  //   expect(v0.canMerge(e)).toBe(false);
-  //   expect(v0.canMerge(v1)).toBe(true);
-  //   expect(v0.canMerge(v1)).toBe(true);
-  //   const pc1 = new EqConstraint(2);
-  //   v1.trySet('key', pc1);
-  //   expect(v0.canMerge(v1)).toBe(false);
-  // });
+  test(`canMerge`, () => {
+    const v0 = new VertexConstraint();
+    const v1 = new VertexConstraint();
+    const e = new EdgeConstraint();
+    const pc0 = new EqConstraint(1);
+    v0.trySet('key', pc0);
+    v1.trySet('key', pc0);
+    expect(v0.canMerge(e)).toBe(false);
+    expect(v0.canMerge(v1)).toBe(true);
+    expect(v0.canMerge(v1)).toBe(true);
+    const pc1 = new EqConstraint(2);
+    v1.trySet('key', pc1);
+    expect(v0.canMerge(v1)).toBe(false);
+  });
 
   test(`merge`, () => {
     const v0 = new VertexConstraint();

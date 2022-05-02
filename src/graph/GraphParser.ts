@@ -7,8 +7,9 @@ import antlr4 from 'antlr4';
 import { ElementConstraint, ElementType } from './constraints/ElementConstraint';
 import { FROM, TO } from './constants';
 import { ScoredGraph } from './Metric';
+import { Step } from './steps/Step';
 
-export const parse = (input: string): ScoredGraph => {
+export const parse = (input: string, mergeLevel: any): [ScoredGraph, Step[]] => {
   const chars = new antlr4.InputStream(input);
   const lexer = new GremlinGxLexer(chars);
   const tokens = new antlr4.CommonTokenStream(lexer);
@@ -19,7 +20,7 @@ export const parse = (input: string): ScoredGraph => {
   const tree = parser.query();
   const graphGenerator = new GraphGenerator();
   antlr4.tree.ParseTreeWalker.DEFAULT.walk(graphGenerator, tree);
-  return graphGenerator.getGraph();
+  return graphGenerator.getGraph(mergeLevel);
 };
 
 export const toDataset = (elements: Set<ElementConstraint>): any[] => {
@@ -46,5 +47,8 @@ export const toDataset = (elements: Set<ElementConstraint>): any[] => {
   };
   const vertexDataset = [...elements].filter((e) => e.type === ElementType.VERTEX).map(toDataObj);
   const edgeDataset = [...elements].filter((e) => e.type === ElementType.EDGE).map(toDataObj);
+  console.log('ELEMENTS-SIZE', elements.size);
+  console.log('VERTEX-DATASET-SIZE', vertexDataset.length);
+  console.log('EDGE-DATASET-SIZE', edgeDataset.length);
   return vertexDataset.concat(edgeDataset);
 };
