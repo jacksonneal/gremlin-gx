@@ -13,7 +13,7 @@ Jackson Neal
 
 External Components:
 
-- Download ANTLR tool [antlr-4.9.3-complete.jar](https://www.antlr.org/download.html), place in `./resources` directory.
+- Download ANTLR tool [antlr-4.9.3-complete.jar](https://www.antlr.org/download.html), place in `./resources` directory at project root.
 
 Dependencies:
 
@@ -24,7 +24,7 @@ npm install
 
 ## Execution
 
-1. Use ANTLR to generate parser for grammar `./src/grammar/GremlinGx.g4`
+1. Use ANTLR to generate parser for grammar [./src/grammar/GremlinGx.g4](./src/grammar/GremlinGx.g4).
 
 ```bash
 npm run generate
